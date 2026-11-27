@@ -74,6 +74,16 @@ describe("running application", () => {
     expect(await response.json()).toMatchObject({ total: 240000 });
   });
 
+  test("keeps a saved cart with a delisted product out of the total", async () => {
+    const response = await fetch(`${base}/api/cart?saved=1`);
+    expect(response.status).toBe(200);
+    const cart = await response.json();
+    expect(cart.total).toBe(240000);
+    expect(cart.lines).toEqual([
+      { productId: 1, name: "Книга об архитектуре", quantity: 1, subtotal: 240000 },
+    ]);
+  });
+
   test("records actual SDK exceptions and successful traffic independently", async () => {
     const response = await fetch(`${base}/__test__/error`, {
       headers: { "x-run-id": "capture-test" },
